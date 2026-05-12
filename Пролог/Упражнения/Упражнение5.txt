@@ -6,11 +6,10 @@
 	isList([]).
 	isList([_|_]).
 
-	Маха всички вложени списъци и вкарва всичко в само един списък
-	flatten1([],[]).
-	flatten1(X, [X]) :- not(isList(X)).
-	flatten1([H | T], R) :- flatten(H, FH), flatten(T, FT), append(FH, FT, R).
-	flatten(L,R) :- isList(L), flatten1(L,R).
+	Маха всички вложени списъци и вкарва всичко в само един списък	
+	flatten([], []).
+	flatten([H | T], [H | R]) :- not(isList(H)), flatten(T, R).
+	flatten([H | T], R) :- isList(H), flatten(H, FH), flatten(T, FT), append(FH, FT, R).
 	
 Задача 2
 

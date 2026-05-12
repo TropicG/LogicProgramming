@@ -1,23 +1,17 @@
 % Зад 1: Да се изравни листа L, тоест ако L = [[1,2,3], [4], [5,6]] да стане [1,2,3,4,5,6]
 isList([]).
-isList([_ | _]).
+isList([_|_]).
 
 append([], L2, L2).
 append([H | L1], L2, [H | Result]) :- append(L1, L2, Result).
 
-flattenHelper([], []).
-flattenHelper(X, [X]) :- not(isList(X)).
-flattenHelper([H | T], FL) :- flattenHelper(H, FH), flattenHelper(T, FT), append(FH, FT, FL). 
-flatten(L, FL) :- isList(L), flattenHelper(L, FL).
-% Идеята е листа L да го направим изравним в FL, за да стане това се предава на helper функция, за да е по лесно
-% В flattenHelper се взима главата H и опашката T на L и се подават отновно на flattenHelper-a за да направят изравнени FH и FT 
-% Накрая изравнените FH и FT се append-ват за да получат директно търсената от нас FL (тоест изравненият оригинално подаден списък)
+flatten([], []).
+flatten([H | T], [H | R]) :- not(isList(H)), flatten(T, R).
+flatten([H | T], R) :- isList(H), flatten(H, FH), flatten(T, FT), append(FH, FT, R).
 
 % Зад 2: Съдържанието на един списък L, се прави прави на подсписъци 
-isEmptyList([]).
 split([], []).
-split(L, [X | R]) :- append(X, Y, L), not(isEmptyList(X)), split(Y,R).
-
+split(L, [X | R]) :- append(X, Y, L), X \= [], split(Y,R).
 % Зад 3: Сбора на елементите на даден списък L да бъде равно на N 
 between(A,B,A) :- A =< B.
 between(A,B,X) :- A < B, A1 is A+1, between(A1,B,X).
