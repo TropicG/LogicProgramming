@@ -22,7 +22,3 @@ subset([H | T], L) :- member(H, L), subset(T, L).
 p3_helper(_, []).
 p3_helper(Y, [H | T]) :- subset(Y, H), p3_helper(Y, T).
 p3(X) :- member(Y, X), p3_helper(Y, X).
-
-p4_helper([]).
-p4_helper([H | T]) :- member(Z, T), not((member(N, H), member(N, Z))), p4_helper(T).
-p4(X) :- p4_helper(X).
