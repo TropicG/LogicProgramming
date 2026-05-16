@@ -38,3 +38,121 @@
 - spanningTree(G, ST) генерира в ST минимално покриващото дърво на графа G
 - hasCycleConnectedGraph(G) проверява дали G е свързан и има цикъл в него
 */
+
+first(X, [X | _]).
+second(X, [ _, X | _]).
+
+last(X, [X]). 
+last(X, [ H | T]) :- last(X, T), X \= H.
+
+member(X, [X | _]). 
+member(X, [H | T]) :- member(X, T), X \= H.
+
+append([], L2, L2).
+append([H | L1], L2, [H | R]) :- append(L1, L2, R).
+
+remove(X, [X | L], L).
+remove(X, [H | L], [H | R]) :- remove(X,L,R), X \= H.
+
+removeAll(X, [], []).
+removeAll(X, [X | L], R) :- removeAll(X, L, R).
+removeAll(X, [H | L], [H | R]) :- removeAll(X, L, R), X \= H.
+
+insert(X, L, R) :- remove(X, R, L).
+
+permutation([],[]).
+permutation([H | T], P) :- permutation(T, TP), insert(H, TP, P).
+
+preffix(X,W) :- append(X,_,W).
+suffix(X,W) :- append(_,X,W).
+
+subsequence([], _).
+subsequence([H | T], [X | Q]) :- subsequence([H | T], Q), H \= X.
+subsequence([H | T], [H | L]) :- subsequence(T,L).
+
+subset([], _).
+subset([H | T], L) :- member(H, L), subset(T,L).
+
+reversed([],[]).
+reversed([H | T],R) :- reversed(T, RT), append(RT, [H], R).
+
+isSorted([]).
+isSorted([X]).
+isSorted([X,Y | L]) :- X < Y, isSorted([Y | L]).
+
+pSort(L,S) :- permutation(L,S), isSorted(S).
+
+min(A,B,B) :- A > B.
+min(A,B,A) :- A =< B.
+minElement([H | T], Min) :- minElement(T, Tmin), min(H, Tmin, Min).
+
+partition([],[],[]).
+partition([H | L], L1, [H | L2]) :- partition(L,L1,L2).
+partition([H | L], [H | L1], L2) :- partition(L,L1,L2).
+
+len([], 0).
+len([X | T], N) :- len(T, M), N is M+1.
+
+nthElement([X | _], X, 0).
+nthElement([H | L], X, N) :- nthElement(L, X, M), N is M+1.
+
+nat(0).
+nat(X) :- nat(Y), X is Y+1.
+
+int(0).
+int(1).
+int(X) :- nat(Y), member(Z,[-1,1]), X is Y*Z.
+
+between(A,B,A) :- A =< B.
+between(A,B,X) :- A < B, A1 is A+1, between(A1,B,X).
+
+range(A,B,[]) :- A > B.
+range(A, B, [A | L]) :- A =< B, A1 is A+1, range(A1,B,L).
+
+pairNatural(X,Y) :- nat(S), between(0,S,X), Y is S-X.
+
+genNS(0,0,[]).
+genNS(N,S, [H | L]) :-
+    N > 0,
+    between(0,S,H),
+    NewS is S-H,
+    NewN is N-1,
+    genNS(NewN, NewS, L).
+
+isList([]).
+isList([_|_]).
+
+flatten([],[]).
+flatten([H | L], [H | F]) :- not(isList(H)), flatten(L, F).
+flatten([H | L], F) :- isList(H), flatten(H, FH), flatten(T, FT), append(FH,FT,F).
+
+split([],[]).
+split(L, [ X | R]) :- append(X,Y,L), X \= [], split(Y,R).
+
+sum([H | T], N) :- sum(T,M), N is M+H.
+
+tree(0,[]).
+tree(N, [A,B]) :- N>0, N1 is N-1, between(0,N1,P), K is N1-P, tree(P,A), tree(K,B).
+
+
+edge(X,Y,E) :- member([X,Y], E), member([Y,X], E).
+
+path([V,E], A, B, Path) :- pathHelper([V,E], A, B, [], Path).
+pathHelper(_, B, B, Visited, Path) :- reversed([B | Visited], Path).
+pathHelper([V,E], A, B, Visited, Path) :- A \= B, edge(A,C,E), not(member(C, Visited)), path([V,E], C, B, [A | Visited], Path).
+
+
+hasCycle([V,E]) :- edge(A,B,E), A \= B, path([V,E], A, B, Path), len(Path, N), N > 2.
+
+isConnected([V,E]) :- not((member(A,V), member(B,V), A \= B, not(path([V,E], A ,B, _)))).
+
+spanningTree([V,E], ST) :- V=[H | T], spanningTreeHelper([V,E], [H], T, ST).
+spanningTree(_,_,[],[]).
+spanningTreeHelper([V,E], Visited, NonVisited, [[U,W] | ST]) :-
+    member(U,Visited),
+    edge(U,W,E),
+    member(W, NonVisited),
+    remove(W, NonVisited, NewNonVisited),
+    spanningTree([V,E], Visited, NewNonVisited, ST).
+
+hasCycleConnctedGraph([V,E]) :- isConnected([V,E]), spanningTree([V,E], ST), len(E, N), len(ST, M), N > M.
