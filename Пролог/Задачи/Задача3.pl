@@ -17,6 +17,7 @@ len([H | L], N) :- len(L, N1), N is N1 + 1.
 append([], L2, L2).
 append([H | L1], L2, [H | Result]) :- append(L1, L2, Result).
 
+reverse([],[]).
 reverse([H | T], R) :- reverse(T, RT), append(RT, [H], R).
 
 % търсене на пътя между два върха в един Path
