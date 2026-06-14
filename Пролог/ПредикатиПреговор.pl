@@ -147,12 +147,12 @@ hasCycle([V,E]) :- edge(A,B,E), A \= B, path([V,E], A, B, Path), len(Path, N), N
 isConnected([V,E]) :- not((member(A,V), member(B,V), A \= B, not(path([V,E], A ,B, _)))).
 
 spanningTree([V,E], ST) :- V=[H | T], spanningTreeHelper([V,E], [H], T, ST).
-spanningTree(_,_,[],[]).
+spanningTreeHelper(_,_,[],[]).
 spanningTreeHelper([V,E], Visited, NonVisited, [[U,W] | ST]) :-
     member(U,Visited),
     edge(U,W,E),
     member(W, NonVisited),
     remove(W, NonVisited, NewNonVisited),
-    spanningTree([V,E], Visited, NewNonVisited, ST).
+    spanningTreeHelper([V,E], [W | Visited], NewNonVisited, ST).
 
 hasCycleConnctedGraph([V,E]) :- isConnected([V,E]), spanningTree([V,E], ST), len(E, N), len(ST, M), N > M.
